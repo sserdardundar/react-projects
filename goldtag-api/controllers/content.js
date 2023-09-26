@@ -18,7 +18,7 @@ const getContent = async (req, res, next) => {
       websites.push(websit);
     }
     if (!websites.length) {
-      throw new BadRequestError("No websites found");
+      throw new Error("No websites found");
     }
     let websiteContents = {};
     for (const website of websites) {
@@ -75,14 +75,12 @@ const getContent = async (req, res, next) => {
         }
       }
       
-      websiteContents[website.title] = {
-        subheaders: subheaders,
-      };
+      websiteContents[website.title] = subheaders
     }
     return res.status(200).json({
       success: true,
       message: "Fetching contents successfull ",
-      data: websiteContents,
+      data: {websites:websiteContents}
     });
   } catch (error) {
     next(error);
@@ -655,97 +653,6 @@ const deleteSth = async (req, res, next) => {
   }
 };
 
-const helpSth = async (req, res, next) => {
-  try {
-    const helps = ["add", "all", "delete", "edit", "get"];
-    const { subject } = req.params;
-    if (!subject || !helps.includes(subject)) {
-      throw new BadRequestError(
-        `Provided parameters are not valid, please use the following parameters to get specific or general help, ${helps}`
-      );
-    }
-    let help = [];
-    if (subject === "add" || subject === "all") {
-      const addobj = {
-        addContent: [
-          {
-            website: "SampleApp",
-            subheaders: [
-              {
-                title: "sampleSubheaderTitle",
-                content: {
-                  ContentSample: {
-                    title: "contentTitle",
-                    idea: "ideaSample",
-                    arrayProperty: ["p1", "p2", "p3"],
-                    objectProperty: { title: "object title" },
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      };
-      help.push({
-        AddMethod: {
-          sample: addobj,
-          helptext: `Add function is capable of adding contents to database with syntax as sample follows. While adding each website and subheader title of them must be named uniquely. As Dynamic contents may have no-same title, each has a dynamicID based on the connected subheaders, As mentioned each dynamic content is connected to a subheader to ease finding. Each dynamic content's content is capable of store arrays,objects, numbers or strings. Tree type input allows subheaders and websites connecteed, added without any inner data(needs just title) `,
-        },
-      });
-    }
-    if (subject === "delete" || subject === "all") {
-      const deleteobj = {
-        contentType: "website/subheader/dynamic",
-        action: "wipe/delete/unwipe/undelete",
-        path: {
-          website: "Goldtag App",
-          subheader: "Main",
-        },
-        toDelete: [0, 1, 2],
-      };
-      help.push({
-        DeleteMethod: {
-          sample: deleteobj,
-          helptext: `Delete function is capable of deactivating contents in database with syntax as sample follows. While deactivating websites, subheader,dynamic contents user can wipe out whole same type under that parent data type ,or delete specific contents but for specific deletion user must provide a toDelete list like in the sample, for Subheader and websites these identifiers are titles but for dynamic contents, user must provide dynamicID's.That is beacuse Dynamic contents may have no-same title, each has a dynamicID based on the connected subheaders. But deletion is not permanent, to restore deactivated ones, user can add un- prefix to actions and it will restore like deletion actions`,
-        },
-      });
-    }
-    if (subject === "edit" || subject === "all") {
-      const editobj = {
-        contentType: "website/subheader/dynamic",
-        path: {
-          website: "Goldtag App",
-          subheader: "Main",
-        },
-        edit: {
-          0: {
-            idea: "Birikimin Geleceği",
-            idoa: "",
-            website: "Goldtag",
-            slogan: "Birikim yapma!",
-          },
-        },
-      };
-      help.push({
-        EditMethod: {
-          sample: editobj,
-          helptext: `Edit function is capable of editing contents to database with syntax as sample follows. While editing content, type and path must be provided. As Dynamic contents may have no-same title, each has a dynamicID based on the connected subheaders,thats why when specifiying editing contents, website and subheaders allow titles but dynamic contents need dynamicIDs. Each dynamic content's content is capable of store arrays,objects, numbers or strings.Each input will overwrite the current one.`,
-        },
-      });
-    }
-    if (subject === "get" || subject === "all") {
-      help.push({
-        GetMethod: `Get function is capable of visualising contents of database.As Dynamic contents may have no-same title, each has a dynamicID based on the connected subheaders,dynamicIDs are presented. Each dynamic content's content is capable of store arrays,objects, numbers or strings. For filtering by website or subheader title, user can use parameters `,
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      message: "Here comes help",
-      data: { help: help },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
 
-module.exports = { getContent, addSth, editSth, deleteSth, helpSth };
+
+module.exports = { getContent, addSth, editSth, deleteSth };
