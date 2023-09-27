@@ -12,8 +12,10 @@ const getContent = async (req, res, next) => {
       websites = await Website.find({ isActive: true });
     } else {
       const websit = await Website.findOne({ title: website, isActive: true });
-      if(!websit){
-        throw new BadRequestError(`Could not find any active websites with the name of -${website}- `)
+      if (!websit) {
+        throw new BadRequestError(
+          `Could not find any active websites with the name of -${website}- `
+        );
       }
       websites.push(websit);
     }
@@ -38,7 +40,7 @@ const getContent = async (req, res, next) => {
           throw new BadRequestError(
             `No subheader found with  *${subheader}* title and parent`
           );
-        } 
+        }
         subs.push(subb);
       }
       let subheaders = {};
@@ -74,13 +76,13 @@ const getContent = async (req, res, next) => {
           }
         }
       }
-      
-      websiteContents[website.title] = subheaders
+
+      websiteContents[website.title] = subheaders;
     }
     return res.status(200).json({
       success: true,
       message: "Fetching contents successfull ",
-      data: {websites:websiteContents}
+      data: { websites: websiteContents },
     });
   } catch (error) {
     next(error);
@@ -89,37 +91,41 @@ const getContent = async (req, res, next) => {
 
 const addSth = async (req, res, next) => {
   try {
-    const { addContent } = req.body;
-    if (!addContent) {
-      throw new BadRequestError("No content found as addcontent");
-    }
-    if (!addContent.length) {
-      throw new BadRequestError("No content found on addcontent");
+    let websiteContent = {};
+    let createCount = 0;
+    const websites = Object.keys(req.body);
+    if (!websites.length) {
+      throw new BadRequestError("No content found to add");
     }
     let error = [];
-    for (content of addContent) {
-      let { website, subheaders} = content;
-      if (!website) {
-        website = "Goldtag App";
+    for (let website of websites) {
+      let webcontent = req.body[website];
+      const fnd = await Website.findOne({ title: website });
+      let web = {};
+      if (fnd) {
+        web = fnd;
+      } else {
+        web = await Website.create({ title: website });
+        createCount++;
       }
-      const web = (await Website.findOne({ title: website }))
-        ? await Website.findOne({ title: website })
-        : await Website.create({ title: website });
       const webID = web._id;
+      websiteContent[website] = {};
+      let subheaders = Object.keys(webcontent);
       if (subheaders) {
         for (const sub of subheaders) {
-          const sbTitle = sub.title ? sub.title : "Main";
           let subb = await SubHeader.findOne({
             belong: webID,
-            title: sbTitle,
+            title: sub,
           });
           if (!subb) {
-            subb = await SubHeader.create({ belong: webID, title: sbTitle });
+            subb = await SubHeader.create({ belong: webID, title: sub });
+            createCount++;
           }
+          websiteContent[website][sub] = {};
           const subID = subb._id;
           const { contentCount } = subb;
-          if (sub.content) {
-            const { content } = sub;
+          if (webcontent[sub]) {
+            let content = webcontent[sub];
             if (Object.keys(content).length) {
               const keyList = Object.keys(content);
               const valueList = Object.values(content);
@@ -128,8 +134,16 @@ const addSth = async (req, res, next) => {
                 const curKey = keyList[i];
                 const curValue = valueList[i];
                 let dynamicObject = {};
+                dynamicObject["isActive"] = true;
                 dynamicObject["belong"] = subID;
                 dynamicObject["category"] = curKey;
+                const doesExist = await Dynamic.findOne({ ...dynamicObject });
+                if (doesExist) {
+                  error.push(
+                    `Dynamic object with category:${doesExist.category} already exists`
+                  );
+                  continue;
+                }
                 if (curValue.title) {
                   dynamicObject["title"] = curValue.title;
                 }
@@ -143,43 +157,39 @@ const addSth = async (req, res, next) => {
                       curValuesValues[j],
                     ]);
                 }
-                const doesExist = await Dynamic.findOne({ ...dynamicObject });
-                if (doesExist) {
-                  error.push(
-                    `Dynamic object with category:${doesExist.category}, id:${doesExist._id} already exists`
-                  );
-                } else {
-                  dynamicObject["dynamicID"] = dynCount + contentCount;
-                  await Dynamic.create({ ...dynamicObject });
-                  dynCount++;
-                }
+                dynamicObject["dynamicID"] = dynCount + contentCount;
+                content[curKey]["dynamicID"] = dynCount + contentCount;
+                websiteContent[website][sub][curKey] = content[curKey];
+                await Dynamic.create({ ...dynamicObject });
+                createCount++;
+                dynCount++;
               }
               await SubHeader.findByIdAndUpdate(subID, {
                 contentCount: contentCount + dynCount,
               });
             }
-          } else {
-            error.push(
-              `No content found in ${sbTitle} SubHeader, if its on purpose please ignore this error `
-            );
           }
         }
-      } else {
-        error.push(
-          `No subheaders found in ${website} website, if its on purpose please ignore this error `
-        );
       }
     }
     if (error.length) {
-      return res.status(200).json({
-        success: true,
-        message: `Adding successfull but there were some errors : ${error}`,
-        data: {},
-      });
+      if (createCount) {
+        return res.status(200).json({
+          success: true,
+          message: `some content is added to db but there were some errors: ${error}`,
+          data: { added: websiteContent },
+        });
+      } else {
+        return res.status(200).json({
+          success: false,
+          error: error,
+        });
+      }
     }
     return res.status(200).json({
       success: true,
       message: `Adding successfull without any errors`,
+      data: { added: websiteContent },
     });
   } catch (error) {
     next(error);
@@ -289,48 +299,57 @@ const editSth = async (req, res, next) => {
           belong: webfund._id,
         });
         const titl = ids[changes.indexOf(chng)];
-        if (isNaN(titl)) {
+        const found = await Dynamic.findOne({
+          category: titl,
+          belong: subfund._id,
+        });
+        if (!found) {
           error.push(
-            `Given identifier is not valid for Dynamic contents, please type in a dynamicID as edit key`
+            `No Dynamic contents found with category: ${titl} and parent subheader ${subfund.title}`
           );
         } else {
-          const found = await Dynamic.findOne({
-            dynamicID: titl,
-            belong: subfund._id,
-          });
-          if (!found) {
-            error.push(
-              `No Dynamic contents found with dynamicID: ${titl} and parent subheader ${subfund.title}`
-            );
-          } else {
-            const subcKeys = Object.keys(chng);
-            let chngObj = {};
-            let incnt = [];
-            let incntobj = {};
-            for (const cont of found.inContent) {
-              incntobj[cont[0]] = cont[1];
-            }
-            for (const subc of subcKeys) {
-              if (subc === "title") {
-                chngObj["title"] = chng[subc];
-              } else if (subc === "isActive") {
-                chngObj["isActive"] = chng[subc];
-              } else if (subc === "category") {
+          const subcKeys = Object.keys(chng);
+          let chngObj = {};
+          let incnt = [];
+          let incntobj = {};
+          for (const cont of found.inContent) {
+            incntobj[cont[0]] = cont[1];
+          }
+          for (const subc of subcKeys) {
+            if (subc === "title") {
+              chngObj["title"] = chng[subc];
+            } else if (subc === "isActive") {
+              chngObj["isActive"] = chng[subc];
+            } else if (subc === "category") {
+              if (found.category !== chng[subc]){
+                const foundd = await Dynamic.findOne({
+                  category: chng[subc],
+                  belong: subfund._id,
+                  isActive:true
+                });
+                if(foundd){
+                  error.push(`Content already exist with category: ${chng[subc]}, remaining parts will be edited`)
+                }
+                else{
+                  chngObj["category"] = chng[subc];
+                }
+              }
+              else{
                 chngObj["category"] = chng[subc];
-              } else {
-                incntobj[subc] = chng[subc];
               }
+            } else {
+              incntobj[subc] = chng[subc];
             }
-            const incntkeys = Object.keys(incntobj);
-            if (incntkeys.length) {
-              for (inc of incntkeys) {
-                incnt.push([inc, incntobj[inc]]);
-              }
-              chngObj["inContent"] = incnt;
+          }
+          const incntkeys = Object.keys(incntobj);
+          if (incntkeys.length) {
+            for (inc of incntkeys) {
+              incnt.push([inc, incntobj[inc]]);
             }
-            if (chngObj) {
-              changing[found._id] = chngObj;
-            }
+            chngObj["inContent"] = incnt;
+          }
+          if (chngObj) {
+            changing[found._id] = chngObj;
           }
         }
       }
@@ -366,9 +385,10 @@ const editSth = async (req, res, next) => {
         }
       } else if (isDynamic) {
         for (const chngID of chngIDs) {
+          const chngg = chngs[chngIDs.indexOf(chngID)];
           const chnSuc = await Dynamic.findByIdAndUpdate(
             chngID,
-            { ...chngs[chngIDs.indexOf(chngID)] },
+            { ...chngg },
             { runValidators: true, new: true }
           ).select("-__v -_id -belong");
           if (!chnSuc) {
@@ -376,15 +396,26 @@ const editSth = async (req, res, next) => {
               `No change is done to the dynamic content with ID:${chngID}`
             );
           } else {
-            changed.push(chnSuc);
+            let chobj={}
+            const chkeys=Object.keys(chnSuc['_doc'])
+            for(keyy of chkeys){
+              if(keyy==='inContent'){
+                for (const it of chnSuc['_doc'][keyy]) {
+                  chobj[it[0]] = it[1];
+                }
+              }
+              else{
+                chobj[keyy]=chnSuc[keyy]
+              }
+            }
+            changed.push(chobj);
           }
         }
       }
       if (error.length) {
         return res.status(200).json({
           success: true,
-          message: `Some errors occured during process`,
-          error: error,
+          message: `Some errors occured during process: ${error}`,
           data: { changed },
         });
       } else {
@@ -397,7 +428,6 @@ const editSth = async (req, res, next) => {
     } else {
       return res.status(400).json({
         success: false,
-        message: `No applicable change found`,
         error: error,
       });
     }
@@ -559,23 +589,17 @@ const deleteSth = async (req, res, next) => {
               );
             } else {
               for (const delID of toDelete) {
-                if (!isNaN(delID)) {
                   const dyn = await Dynamic.findOne({
                     belong: subfound._id,
-                    dynamicID: delID,
+                    category: delID,
                   });
                   if (dyn) {
                     changing[dyn._id] = { isActive: doesUnSelect };
                   } else {
                     error.push(
-                      `${delID} is not valid please type in a valid dynamicID `
+                      `${delID} is not valid please type in a valid category `
                     );
                   }
-                } else {
-                  error.push(
-                    `${delID} is not valid please type in a valid dynamicID `
-                  );
-                }
               }
             }
           }
@@ -623,7 +647,18 @@ const deleteSth = async (req, res, next) => {
               `No change is done to the dynamic content with ID:${chngID}`
             );
           } else {
-            deleted.push(chnSuc);
+            let chobj = {};
+            const chkeys = Object.keys(chnSuc["_doc"]);
+            for (keyy of chkeys) {
+              if (keyy === "inContent") {
+                for (const it of chnSuc["_doc"][keyy]) {
+                  chobj[it[0]] = it[1];
+                }
+              } else {
+                chobj[keyy] = chnSuc[keyy];
+              }
+            }
+            deleted.push(chobj);
           }
         }
       }
@@ -631,14 +666,14 @@ const deleteSth = async (req, res, next) => {
       if (error.length) {
         return res.status(200).json({
           success: true,
-          message: `Some errors occured during process`,
-          error: error,
+          message: `Some errors occured during process:${error}`,
+          data:{changed:deleted}
         });
       } else {
         return res.status(200).json({
           success: true,
           message: `${process} is successfull without any errors`,
-          data: {},
+          data: {changed:deleted},
         });
       }
     } else {
@@ -652,7 +687,5 @@ const deleteSth = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 module.exports = { getContent, addSth, editSth, deleteSth };

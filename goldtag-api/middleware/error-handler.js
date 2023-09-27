@@ -19,6 +19,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
       customError.msg = `Duplicate value entered for ${Object.keys(
         err.keyValue
       )} field, please choose another value`;
+      customError.statusCode = 409;
     }
     customError.statusCode = 400
   }

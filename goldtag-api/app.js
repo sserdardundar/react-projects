@@ -5,10 +5,10 @@ require("dotenv").config();
 const connectDB = require("./db/connect");
 const authRouter = require("./routes/auth");
 const contentRouter = require("./routes/content");
-const authUser = require("./middleware/authentication");
-swaggerJsdoc = require("swagger-jsdoc");
-swaggerUi = require("swagger-ui-express");
 
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+const morgan = require("morgan");
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 const bodyParser = require("body-parser");
@@ -20,13 +20,24 @@ const options = {
     info: {
       title: "Goldtag API",
       version: "0.1.0",
-      description: "Goldtag API via Swagger",
+      description: "Goldtag API swagger",
       contact: {
         name: "Goldtag",
         url: "https://goldtag.org",
         email: "info@goldtag.net",
       },
     },
+    components: {
+      securitySchemas: {
+        Authorization: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          value: "Bearer <JWT HERE>",
+        },
+      },
+    },
+    security: [{ Authorization: [] }], // Global security requirement
     servers: [
       {
         url: "http://localhost:4000",
@@ -37,7 +48,8 @@ const options = {
 };
 
 const specs = swaggerJsdoc(options);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs,{explorer:true}));
+app.use(morgan("dev"));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.use(bodyParser.json());
 app.use("/", authRouter);
 app.use("/", contentRouter);
