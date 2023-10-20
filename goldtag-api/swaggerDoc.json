@@ -1,0 +1,690 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Goldtag App",
+    "contact": {
+      "name": "Goldtag App",
+      "url": "https://goldtag.org",
+      "email": "info@goldtag.net"
+    },
+    "version": "1.0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "variables": {}
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "register user",
+        "description": "Registers user",
+        "operationId": "registeruser",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/registeruserrequest"
+                  },
+                  {
+                    "example": {
+                      "name": "peterpan",
+                      "email": "peter3@gmail.com",
+                      "password": "LKkBUIblm-o0"
+                    }
+                  }
+                ]
+              },
+              "example": {
+                "name": "peterpan",
+                "email": "peter3@gmail.com",
+                "password": "LKkBUIblm-o0"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Register Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/successresponse"
+                    },
+                    {
+                      "example": {
+                        "success": true,
+                        "message": "Signing successfull ",
+                        "data": {
+                          "user": {
+                            "name": "peterpan",
+                            "email": "peter3@gmail.com"
+                          },
+                          "token": "9jkk5nmterjbtokp453hujrh34hugq3rj43oi29yr39ofhoiwe8ehf8934hggf98723g8wy47tgf7w3gu9wg7rf8wehf9wf"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/badrequest"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userconflict"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": []
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "login user",
+        "description": "Login as user",
+        "operationId": "loginuser",
+        "parameters": [],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/loginuserrequest"
+                  },
+                  {
+                    "example": {
+                      "email": "peter3@gmail.com",
+                      "password": "LKkBUIblm-o0"
+                    }
+                  }
+                ]
+              },
+              "example": {
+                "email": "peter3@gmail.com",
+                "password": "LKkBUIblm-o0"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Login Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/successresponse"
+                    },
+                    {
+                      "example": {
+                        "success": true,
+                        "message": "Signing successfull ",
+                        "data": {
+                          "user": {
+                            "name": "peterpan",
+                            "email": "peter3@gmail.com"
+                          },
+                          "token": "9jkk5nmterjbtokp453hujrh34hugq3rj43oi29yr39ofhoiwe8ehf8934hggf98723g8wy47tgf7w3gu9wg7rf8wehf9wf"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No user found with that email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/badrequest"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": []
+      }
+    },
+    "/get/{id}&{active}": {
+      "get": {
+        "tags": ["Content"],
+        "summary": "get content",
+        "description": "gets filtered content from database",
+        "operationId": "getcontent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "all"
+            }
+          },
+          {
+            "name": "active",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "all"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/successresponse"
+                    },
+                    {
+                      "example": {
+                        "success": true,
+                        "message": "Fetching contents successfull ",
+                        "data": [
+                          {
+                            "category": "Features",
+                            "title": "Features of Test App",
+                            "feature1": {
+                              "title": "Sharing",
+                              "description": "Sharing is caring",
+                              "media": "Photo"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/badrequest"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/add/{belongId}": {
+      "post": {
+        "tags": ["Content"],
+        "summary": "add content",
+        "operationId": "addcontent",
+        "parameters": [
+          {
+            "name": "belongId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/addcontentrequest"
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Add Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/successresponse"
+                    },
+                    {
+                      "example": {
+                        "success": true,
+                        "message": "Adding successfull without any errors",
+                        "data": {
+                          "added": [
+                            {
+                              "category": "Features",
+                              "title": "Features of Test App",
+                              "feature1": {
+                                "title": "Sharing",
+                                "description": "Sharing is caring",
+                                "media": "Photo"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/badrequest"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/edit/{editId}": {
+      "post": {
+        "tags": ["Content"],
+        "summary": "edit content",
+        "operationId": "editcontent",
+        "parameters": [
+          {
+            "name": "editId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/editcontentrequest"
+                  },
+                  {
+                    "example": {
+                      "edit": {
+                        "category": "Features",
+                        "title": "Features of Test App",
+                        "feature1": {
+                          "title": "Sharing",
+                          "description": "Sharing is caring",
+                          "media": "Photo"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Edit Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/successresponse"
+                    },
+                    {
+                      "example": {
+                        "success": true,
+                        "message": "Editing is successfull without any errors",
+                        "data": {
+                          "changed": {
+                            "category": "Features",
+                            "title": "Features of Test App",
+                            "feature1": {
+                              "title": "Sharing",
+                              "description": "Sharing is caring",
+                              "media": "Photo"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/badrequest"
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/delete/{id}": {
+      "post": {
+        "tags": ["Content"],
+        "summary": "delete content",
+        "operationId": "deletecontent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "delete body only works with dynamic contents ",
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  { "$ref": "#/components/schemas/deletecontentrequest" },
+
+                  {
+                    "example": {
+                      "toDelete": ["feature1", "feature2"]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Delete Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/successresponse"
+                    },
+                    {
+                      "example": {
+                        "success": true,
+                        "message": "Deletion is successfull without any errors",
+                        "data": {
+                          "changed": [
+                            {
+                              "category": "Features",
+                              "title": "Features of Test App",
+                              "feature1": {
+                                "title": "Sharing",
+                                "description": "Sharing is caring",
+                                "media": "Photo"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/badrequest" },
+                    {
+                      "example": {
+                        "success": false,
+                        "error": "Bad request please type in valid values/parameters"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "registeruserrequest": {
+        "title": "registeruserrequest",
+        "required": ["name", "email", "password"],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "name": "peterpan",
+          "email": "peter3@gmail.com",
+          "password": "LKkBUIblm-o0"
+        }
+      },
+      "loginuserrequest": {
+        "title": "loginuserrequest",
+        "required": ["email", "password"],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "email": "peter3@gmail.com",
+          "password": "LKkBUIblm-o0"
+        }
+      },
+      "addcontentrequest": {
+        "title": "addcontentrequest",
+        "required": ["addContent"],
+        "type": "object",
+        "properties": {
+          "addContent": {
+            "type": "object"
+          }
+        },
+        "example": {
+          "addContent": {
+            "category": "Features",
+            "title": "Features of Test App",
+            "feature1": {
+              "title": "Sharing",
+              "description": "Sharing is caring",
+              "media": "Photo"
+            }
+          }
+        }
+      },
+      "editcontentrequest": {
+        "title": "editcontentrequest",
+        "required": ["edit"],
+        "type": "object",
+        "properties": {
+          "edit": {
+            "type": "object"
+          }
+        }
+      },
+      "deletecontentrequest": {
+        "title": "deletecontentrequest",
+        "required": ["toDelete"],
+        "type": "object",
+        "properties": {
+          "toDelete": {
+            "type": "object"
+          }
+        }
+      },
+      "successresponse": {
+        "title": "success",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "badrequest": {
+        "title": "badrequest",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "success": false,
+          "error": "Bad request please type in valid values/parameters"
+        }
+      },
+      "userconflict": {
+        "title": "conflict",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "success": false,
+          "error": "User already exist in DB with given email please type in another value"
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "security": [],
+  "tags": [
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Content"
+    }
+  ]
+}

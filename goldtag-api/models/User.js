@@ -37,5 +37,4 @@ const userSchema= new mongoose.Schema({
         return isaMatch
     }
 const User = mongoose.model('User',userSchema)
-User.createIndexes();  
 module.exports=User  

@@ -5,10 +5,6 @@ const subhSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     required: [true, " parent website name is required"],
   },
-  contentCount:{
-    type:Number,
-    default:0
-  },
   title: {
     type: String,
     required: [true, "subheader title is required"],

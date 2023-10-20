@@ -17,7 +17,15 @@ const register = async (req, res, next) => {
       .status(200)
       .json({ success: true,message:"User created successfully", data: {user,token} });
   } catch (error) {
-    next(error);
+    next(error);const express= require('express')
+const router= express.Router()
+const {login,register}=require('../controllers/auth')
+
+router.post('/auth/register',register)
+
+router.post('/auth/login',login)
+
+module.exports=router
   }
 };
 

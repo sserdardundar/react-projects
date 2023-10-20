@@ -16,9 +16,6 @@ const dynSchema = new mongoose.Schema({
     type: Array,
     default:[[]]
   },
-  dynamicID:{
-    type:Number
-  },
   isActive:{
       type:Boolean,
       default:true,
