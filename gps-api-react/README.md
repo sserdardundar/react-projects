@@ -45,8 +45,10 @@ The backend GPS-API utilizes MongoDB as its database to store coin-related data.
 ### Frontend
 1. Build the application:
    ```bash
-npm run build
-
+   npm run build
+   ```
+  - This will generate a `build` folder containing the static files for deployment.
+2. Deploy the contents of the `build` folder to a hosting platform like Netlify, Vercel, or GitHub Pages.
 ### Backend
 1. Set up a MongoDB database and configure the connection URI in the environment file (`.env`).
 2. Start the server:
