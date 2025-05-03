@@ -1,70 +1,72 @@
-# Getting Started with Create React App
+# GPS-API-React
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## About the Project
 
-## Available Scripts
+This project is a **crypto wallet emulator** designed to:
+- List the coins added to the wallet.
+- Display their price history with filters for date ranges.
+- Fetch historical data for coins not added to the wallet at a specific time, using the **GPS-API**.
 
-In the project directory, you can run:
+The backend GPS-API utilizes MongoDB as its database to store coin-related data. The React frontend communicates with this API to provide a seamless user experience.
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. **Wallet Management**:
+   - Add and remove coins from the wallet.
+   - View detailed price history for each coin.
+   - Filter coin data by custom date ranges.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+2. **User Interface**:
+   - Responsive design with support for mobile and desktop views.
+   - Navigation through a bottom navigator for quick access to different sections like the home, wallet, and account settings.
 
-### `npm test`
+3. **Integration**:
+   - Backend API integration for fetching real-time and historical coin data.
+   - Uses Material-UI components for a clean and intuitive interface.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+4. **Authentication**:
+   - Secure user authentication for accessing wallet features.
+   - Email verification and customizable notification preferences.
 
-### `npm run build`
+## Project Structure
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Frontend**: Built with React, featuring components like `Home.js`, `Manage.js`, and `ReqWithAuth.js` for handling wallet operations and API requests.
+  - `src/Router.js`: Defines the application's routing logic.
+  - `src/components`: Contains reusable components for navigation, data visualization, and user interaction.
+  - `public/index.html`: Entry point for rendering the React application in the browser.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **Backend**: Developed using Node.js and Express, with MongoDB as the database.
+  - `app.js`: Main server file to handle API endpoints and middleware.
+  - `db/connect.js`: Establishes the database connection.
+  - `models/Crypto.js`: Defines the schema for storing cryptocurrency data.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Deployment Process
 
-### `npm run eject`
+### Frontend
+1. Build the application:
+   ```bash
+npm run build
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Backend
+1. Set up a MongoDB database and configure the connection URI in the environment file (`.env`).
+2. Start the server:
+   node app.js
+3. Ensure the backend is hosted on a service like Heroku or AWS to provide API access to the frontend.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Getting Started
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Prerequisites
+- Node.js and npm installed on your machine.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Installation
+1. Clone the repository:
+   git clone https://github.com/sserdardundar/react-projects.git
+2. Navigate to the project directory:
+   cd gps-api-react
+3. Install dependencies:
+   npm install
 
 ## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+For a deeper understanding of React and its ecosystem, refer to:
+- React Documentation: https://reactjs.org/
+- Material-UI Documentation: https://mui.com/
